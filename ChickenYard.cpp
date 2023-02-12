@@ -55,9 +55,8 @@ void ChickenYard::shuffleBones() {
  */
 void ChickenYard::generateYard()
 {
-
-
-    boneYard->createYard(std::move(yardArray));
+    for(auto x = 0; x < boneCount; x++)
+        boneYard->createYard(yardArray[x]);
 }
 
 /*

@@ -78,16 +78,6 @@ protected:
 
     node*& getList();
 
-private:
-    // all derived versions of the DLL container will be the exact same
-    // so we don't need a virtual destructor on the node,
-    // rather we will just use a virtual destructor in the base class DLL
-
-
-    node *head;
-    node *tail;
-    int listSize;
-
 public:
     DLL();
 
@@ -116,11 +106,10 @@ class playersDLL : public DLL
 
 private:
 
-    Bone * recentDraw; // store a pointer to the last drawn bone
+	node * head;
+	node * tail;
     int handCount;
-
-
-
+	const static int START_SIZE 7
     void getPoints(DLL::node *, int &);
 
     virtual void displayList(DLL::node *);
@@ -155,6 +144,7 @@ class yardsDLL : public DLL
 {
 
 private:
+	node * head;
 #define YARD_SIZE 52
 
     yardsDLL(array<Bone, 52> bones);
@@ -175,7 +165,7 @@ public:
     {
 
     }
-    void createYard(std::array<Bone,52>);
+    void createYard(const Bone &);
     void drawHand(playersDLL &);
     bool draw(playersDLL &);
     virtual void display() {

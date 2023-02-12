@@ -349,33 +349,15 @@ yardsDLL::yardsDLL(): DLL(),boneCount(0)
 
 }
 
-yardsDLL::yardsDLL(std::array<Bone,52> bones): DLL(), boneCount(0)
+
+
+void yardsDLL::createYard(const Bone &aBone)
 {
-    createYard(std::move(bones));
+    DLL::insert(aBone);
+    boneCount++;
 }
 
 
-void yardsDLL::createYard(std::array<Bone,52> bones)
-{
-    for(auto x = 0; x < 52; x++)
-    {
-        Bone temp(bones[x]);
-        insert(temp);
-    }
-}
-
-
-void yardsDLL::firstFill(node *& curr,
-                         node * previous,
-                         boneArray bArray,
-                         int & count)
-{
-    if(count == YARD_SIZE)
-        return;
-    insert(bArray[count]);
-
-    firstFill(curr->next, curr, bArray, ++count);
-}
 
 
 yardsDLL::yardsDLL(const yardsDLL &aYard):DLL(aYard),boneCount(aYard.boneCount)
