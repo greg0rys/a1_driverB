@@ -11,9 +11,8 @@ private:
 
 
     playersDLL * hand;
-    Bone * recentDraw;
 
-    int points, handCount,playerNo;
+    int points, handCount, playerNo;
     const static int HAND_START = 7;
     bool firstHand;
 

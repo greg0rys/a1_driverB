@@ -87,12 +87,18 @@ ChickenYard &ChickenYard::operator=(const ChickenYard &aYard) {
     if (this == &aYard)
         return *this;
 
+    if(!aYard.boneYard)
+    {
+        boneYard = nullptr;
+        boneCount = aYard.boneCount;
+        shuffled = aYard.shuffled;
+        return *this;
+    }
+
     if(boneYard)
         delete boneYard;
 
-    boneYard = new yardsDLL();
-    boneYard = aYard.boneYard;
-
+    boneYard = new yardsDLL(*aYard.boneYard);
     boneCount = aYard.boneCount;
     shuffled = aYard.shuffled;
 
@@ -120,11 +126,8 @@ void ChickenYard::getHand(Player *& aPlayer)
 
 bool ChickenYard::draw(Player *& aPlayer)
 {
-    if(boneYard->isEmpty())
-        return false;
+    return boneYard->draw(aPlayer->getHand());
 
-    boneYard->draw(aPlayer->getHand());
-    return true;
 }
 
 // helper functions
@@ -132,21 +135,19 @@ bool ChickenYard::draw(Player *& aPlayer)
 // check if the chickenYards linked list is empty
 bool ChickenYard::isEmpty() const
 {
-   return boneYard->isEmpty();
+   return boneYard->totalBones() == 0;
 }
 
 // get a total count of all bones in the boneYard linked list.
 int ChickenYard::getCount()
 {
-    int count = 0;
-    boneYard->getCount(count);
-    return count;
+    return boneYard->totalBones();
 }
 
 // print the array of bones to show shuffle.
 void ChickenYard::printYardArr() {
-    if (!shuffled)
-        cout << "Here's the bones before shuffle! " << endl;
+
+    cout << "Here's the bones before shuffle! " << endl;
 
     for (auto x = 0; x < INIT_SIZE; x++) {
         cout << x + 1 << " [ " << yardArray[x].getSideA()

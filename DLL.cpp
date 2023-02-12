@@ -2,61 +2,29 @@
 
 #include <utility>
 
-DLL::DLL():head(nullptr),tail(nullptr),listSize(0)
-{}
 
 
-DLL::DLL(const DLL &aCopy):head(nullptr),tail(nullptr),listSize(0)
+
+DLL::DLL(const DLL &aCopy)
 
 {
     *this = aCopy;
 }
 
- DLL& DLL::operator=(const DLL &aCopy)
-{
-    if(this == &aCopy)
-        return *this;
 
-    if(isEmpty())
-    {
-        head = tail = nullptr;
-        listSize = aCopy.listSize;
-        return *this;
-    }
-
-    if(head)
-        destroy();
-
-    copyChain(head, aCopy.head);
-    tail = getTail();
-    listSize = aCopy.listSize;
-
-    return *this;
-}
 
 
 DLL::~DLL()
 {
-    if(isEmpty())
-    {
-        head = tail = nullptr;
-        return;
-    }
 
-    destroy();
-    head = tail = nullptr;
 }
 
 
-void DLL::destroy()
-{
-    destroyList(head);
-}
 
 
 void DLL::destroyList(DLL::node *& top)
 {
-    if(!top || isEmpty())
+    if(!top || isEmpty(top))
         return;
 
     destroyList(top->next);
@@ -64,22 +32,12 @@ void DLL::destroyList(DLL::node *& top)
 }
 
 
-void DLL::getCount(int &counter)
-{
-    if(isEmpty())
-    {
-        counter = 0;
-        return;
-    }
-
-    countChain(head, counter);
-}
 
 
 
 void DLL::countChain(DLL::node *top, int &counter)
 {
-    if(!top || isEmpty())
+    if(!top || isEmpty(top))
         return;
 
     countChain(top->next, ++counter);
@@ -87,9 +45,9 @@ void DLL::countChain(DLL::node *top, int &counter)
 }
 
 
-bool DLL::isEmpty()
+bool DLL::isEmpty(node * aList)
 {
-    return head;
+    return aList == nullptr;
 }
 
 
@@ -106,76 +64,27 @@ void DLL::copyChain(DLL::node *& destList, DLL::node * sourceList)
     copyChain(destList->next, sourceList->next);
 }
 
-
-DLL::node* DLL::getHead()
+// the players DLL will need to handle updating its own tail
+void DLL::insert(DLL::node*& start, const Bone &bone)
 {
-    return head;
-}
-
-
-void DLL::setHead(const Bone &aBone)
-{
-    if(!head)
+    if(!start)
     {
-        head = new node();
-        *(head->data) = aBone;
-        head->next = nullptr;
-        head->prev = nullptr;
-        tail = head;
+        start = new node(bone);
+        start->next = nullptr;
+        start->prev = nullptr;
+
     }
 
-    node * temp = nullptr;
-    temp = new node();
-    *(temp->data) = aBone;
-    head->prev = temp;
-    temp->next = head;
-    head = temp;
+    if(start->next)
+        insert(start->next, bone);
 
-}
-
-
-DLL::node* DLL::getTail()
-{
-    auto * curr = head;
-
-    while(curr && curr->next)
-        curr = curr->next;
-
-    // special check to make sure that the tail pointer is actually
-    // pointing at the last item - if their totals differ set tail to curr
-    // which at this point is the end of the list.
-    if(curr->data->getBoneTotal() != tail->data->getBoneTotal())
-        tail = curr;
-
-    return tail;
-
-}
-
-
-void DLL::setTail(DLL::node * newTail)
-{
-    tail = newTail;
-}
-
-
-void DLL::insert(const Bone &aBone)
-{
-    if(!head)
+    if(!start->next)
     {
-        head = new node(aBone);
-        head->prev = nullptr;
-        head->next = nullptr;
+        start->next = new node(bone);
+        start->next->prev = start;
+        start->next->next = nullptr;
+        return;
     }
-    node * curr = head;
-    node * temp = nullptr;
-
-    while(curr && curr->next)
-        curr = curr->next;
-
-    temp = new node(aBone);
-    temp->prev = curr;
-    curr->next = temp;
-    tail = temp;
 
 }
 
@@ -207,18 +116,13 @@ void DLL::displayList(DLL::node * top)
 
 }
 
-void DLL::display()
-{
-    displayList(head);
-}
-
 
 
 /**
  * playerList implements
  */
 
-playersDLL::playersDLL(): DLL(),handCount(0),recentDraw(nullptr)
+playersDLL::playersDLL(): DLL(),head(nullptr),tail(nullptr),handCount(0)
 {
 }
 
@@ -228,7 +132,8 @@ playersDLL::playersDLL(): DLL(),handCount(0),recentDraw(nullptr)
 // then we can just use the playersDLL copy constructor to handle the
 // elements that pretain to the playersDLL
 playersDLL::playersDLL(const playersDLL &playersHand): DLL(),
-                                                       recentDraw(nullptr),
+                                                       head(nullptr),
+                                                       tail(nullptr),
                                                        handCount(0)
 {
     *this = playersHand;
@@ -239,23 +144,19 @@ playersDLL& playersDLL::operator=(const playersDLL &aPlayersHand)
 {
     if(this == &aPlayersHand)
         return *this;
-
-    int copiesHand = 0;
-
-    if(aPlayersHand.recentDraw)
+    if(!aPlayersHand.head)
     {
-        if(recentDraw)
-            delete recentDraw;
-        recentDraw = nullptr;
-        recentDraw = new Bone(*aPlayersHand.recentDraw);
-    }
-    else
-    {
-        recentDraw = nullptr;
+        head = tail = nullptr;
+        handCount = aPlayersHand.handCount;
+        return *this;
     }
 
-    getCount(copiesHand);
-    handCount = copiesHand;
+    if(head)
+        destroy();
+    head = nullptr;
+    copyChain(head, aPlayersHand.head);
+    tail = aPlayersHand.tail;
+    handCount = aPlayersHand.handCount;
 
     return *this;
 
@@ -263,12 +164,16 @@ playersDLL& playersDLL::operator=(const playersDLL &aPlayersHand)
 
 playersDLL::~playersDLL()
 {
-    if(recentDraw)
-        delete recentDraw;
+    destroyList(head);
+    head = tail = nullptr;
 
-    recentDraw = nullptr;
-    handCount = 0;
+}
 
+
+void playersDLL::destroy()
+{
+    destroyList(head);
+    tail = nullptr;
 }
 
 
@@ -278,33 +183,19 @@ void playersDLL::display()
     int points = 0;
     getPoints(points);
     /* have client program check for empty before calling this*/
-    DLL::displayList(getHead());
+    DLL::displayList(head);
 
-    cout << "\n\t Most recent draw: " << recentDraw
-         << " Current Points: " << points << endl;
+    cout << "\n\t Most recent draw: ";  tail->data->printSides();
+         cout << " Current Points: " << points
+         <<" Total Bones: " << handCount << endl;
 }
 
-
-void playersDLL::displayList(DLL::node * start)
-{
-    static int formatter = 1;
-
-    if(!start || isEmpty())
-        return;
-    start->data->printSides();
-
-    if(formatter % 5 == 0)
-        cout << endl;
-    formatter++;
-    displayList(start->next);
-
-}
 
 
 
 void playersDLL::getPoints(int &pointTotal)
 {
-    getPoints(getHead(),pointTotal);
+    getPoints(head,pointTotal);
 }
 
 
@@ -319,13 +210,33 @@ void playersDLL::getPoints(DLL::node * top, int &points)
 
 void playersDLL::addBone(const Bone &aBone)
 {
-    DLL::insert(aBone);
+    DLL::insert(head, aBone);
+    tail = getEndOfHand(); // reset the tail pointer each insert
+    handCount++;
 }
 
 
-Bone& playersDLL::getEnd()
+DLL::node* playersDLL::getEndOfHand()
 {
-    return *getTail()->data;
+
+    node * curr = head;
+
+    if(!curr)
+        return curr;
+
+    while(curr && curr->next)
+        curr = curr->next;
+
+    return curr;
+}
+
+
+
+
+
+void playersDLL::getCount(int &val)
+{
+    val = handCount;
 }
 
 
@@ -333,7 +244,7 @@ Bone& playersDLL::getEnd()
 ostream &operator<<(ostream &out, playersDLL &playersHand)
 {
     playersHand.display();
-    out << "********** " << endl;
+    out << "********** "  << "\t********** " << endl;
     return out;
 
 }
@@ -344,7 +255,7 @@ ostream &operator<<(ostream &out, playersDLL &playersHand)
  * yardsDLL implementations
  */
 
-yardsDLL::yardsDLL(): DLL(),boneCount(0)
+yardsDLL::yardsDLL(): DLL(),head(nullptr), boneCount(0)
 {
 
 }
@@ -353,56 +264,85 @@ yardsDLL::yardsDLL(): DLL(),boneCount(0)
 
 void yardsDLL::createYard(const Bone &aBone)
 {
-    DLL::insert(aBone);
+    DLL::insert(head,  aBone);
     boneCount++;
 }
 
 
 
 
-yardsDLL::yardsDLL(const yardsDLL &aYard):DLL(aYard),boneCount(aYard.boneCount)
+yardsDLL::yardsDLL(const yardsDLL &aYard):DLL(aYard),
+                                          head(nullptr) ,
+                                          boneCount(0)
 {
     *this = aYard;
 }
 
 
+yardsDLL& yardsDLL::operator=(const yardsDLL &aYard)
+{
+    if(this == &aYard)
+        return *this;
+    if(!aYard.head)
+    {
+        head = nullptr;
+        boneCount = aYard.boneCount;
+        return *this;
+    }
 
+    if(head)
+        destroy();
+
+    head = nullptr;
+    copyChain(head, aYard.head);
+    boneCount = aYard.boneCount;
+
+    return *this;
+}
+
+
+yardsDLL::~yardsDLL()
+{
+    destroyList(head);
+    head = nullptr;
+}
+
+
+void yardsDLL::destroy()
+{
+    destroyList(head);
+}
 
 
 void yardsDLL::drawHand(playersDLL & playersHand)
 {
     int count = 0;
-    drawFirstHand(playersHand, count);
+    drawFirstHand(head, playersHand, count);
 }
 
 
-void yardsDLL::drawFirstHand(playersDLL & aPlayer, int & count)
+void yardsDLL::drawFirstHand(DLL::node*& yard,playersDLL & aPlayer,
+                             int &count)
 {
-    cout << "drawing first hand";
-    if(!isEmpty())
+    if(!yard)
         return;
 
     if(count == 7)
         return;
+    aPlayer.addBone(*yard->data);
+    drawFirstHand(yard->next, aPlayer, ++count);
+    DLL::remove(yard);
 
-    node * yardCurrent = getHead();
-    Bone & currentBone = *getHead()->data;
-
-    aPlayer.addBone(currentBone);
-    remove(yardCurrent);
-    drawFirstHand(aPlayer, ++count);
 }
 
 
 bool yardsDLL::draw(playersDLL & playersHand)
 {
-    // gaurd from drawing on an empty pointer.
-    if(isEmpty())
+    if(isEmpty(head))
         return false;
-    node * yardCurrent = nullptr;
-    yardCurrent = getHead();
 
-    drawBone(playersHand, yardCurrent);
+
+    drawBone(playersHand, head);
     return true;
 }
 
@@ -410,8 +350,14 @@ void yardsDLL::drawBone(playersDLL& aPlayer, DLL::node *&boneYard)
 {
 
     aPlayer.addBone(*boneYard->data);
-    remove(boneYard);
+    DLL::remove(boneYard);
 
+}
+
+
+int& yardsDLL::totalBones()
+{
+    return boneCount;
 }
 
 

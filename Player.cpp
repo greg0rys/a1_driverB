@@ -3,10 +3,10 @@
 /*
  * Default constructor
  */
-Player::Player(): hand(new playersDLL()), recentDraw(nullptr), points(0),
-                       handCount(0)
-,playerNo(0),firstHand(true)
-
+Player::Player(): hand(new playersDLL()), points(0),
+                                          handCount(0),
+                                          playerNo(0),
+                                          firstHand(true)
 {
 
 }
@@ -15,8 +15,11 @@ Player::Player(): hand(new playersDLL()), recentDraw(nullptr), points(0),
  * Copy Constructor
  * TODO: edit copy chain method to copy a double linked list rather than single
  */
-Player::Player(const Player &aPlayer): hand(nullptr), recentDraw(nullptr),
-                                       points(0)
+Player::Player(const Player &aPlayer): hand(nullptr),
+                                       points(0),
+                                       handCount(0),
+                                       playerNo(0),
+                                       firstHand(aPlayer.isFirstHand())
 {
     *this = aPlayer;
 }
@@ -33,16 +36,19 @@ Player& Player::operator=(const Player &aPlayer)
     if(!aPlayer.hand)
     {
         hand = nullptr;
-    }
-    else
-    {
-        if(hand)
-            delete hand;
-        hand = new playersDLL();
-        hand = aPlayer.hand;
+        points = aPlayer.points;
+        handCount = aPlayer.handCount;
+        firstHand = aPlayer.firstHand;
+        return *this;
     }
 
-    recentDraw = aPlayer.recentDraw;
+        if(hand)
+            delete hand;
+
+        hand = nullptr;
+        hand = new playersDLL(*aPlayer.hand);
+
+
     handCount = aPlayer.handCount;
     points = aPlayer.points;
     firstHand = aPlayer.firstHand;
@@ -58,6 +64,7 @@ Player::~Player()
 {
     if(hand)
         delete hand;
+
     hand = nullptr;
 }
 
@@ -90,7 +97,6 @@ bool Player::isFirstHand() const
 void Player::addToHand(const Bone & aBone)
 {
    hand->addBone(aBone);
-   recentDraw = &hand->getEnd();
    handCount++;
 }
 

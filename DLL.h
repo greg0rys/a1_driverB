@@ -64,39 +64,36 @@ protected:
     void setTail(node *);
 
 
-    void insert(const Bone &);
-    void remove(DLL::node *&);
+    void insert(DLL::node *&, const Bone &);
+    static void remove(DLL::node *&);
 
     virtual void displayList(node *);
 
     void destroyList(node *&);
 
-
     void copyChain(node *&, node *);
 
     void countChain(node *, int &);
 
+    static bool isEmpty(node *);
+
     node*& getList();
 
 public:
-    DLL();
+    DLL() = default;
 
     DLL(const DLL &);
 
-    DLL &operator=(const DLL &);
-
    virtual ~DLL();
-    // doesn't need to be virtual because
-    // all derived classes will use the destroy method in the same way
-    void destroy();
     // when you have a pure virtual function all derived classes MUST
     // implement their own version of the pure virtual function as a vitural
     // function. or it will not compile.
     virtual void display() = 0;
+    // may need to redefine display in base class
 
-    void getCount(int &);
 
-    bool isEmpty();
+
+
 
 };
 
@@ -108,11 +105,11 @@ private:
 
 	node * head;
 	node * tail;
-    int handCount;
-	const static int START_SIZE 7
+    int handCount; // store the count so we don't have to recurse each time
+	const static int START_SIZE = 7;
     void getPoints(DLL::node *, int &);
-
-    virtual void displayList(DLL::node *);
+    node* getEndOfHand();
+    node*& getStartofHand();
 
 
 public:
@@ -123,19 +120,16 @@ public:
     playersDLL & operator=(const playersDLL &);
 
     virtual ~playersDLL();
+    virtual void destroy();
 
      void display() override;
 
     void getPoints(int &);
 
-    // return a ref to the handcount already stored so we don't create more
-    int& getHandCount() { return handCount;}
-
     friend ostream& operator<<(ostream&, playersDLL &);
 
-
     void addBone(const Bone &);
-    Bone& getEnd();
+    virtual void getCount(int &);
 
 
 };
@@ -144,32 +138,28 @@ class yardsDLL : public DLL
 {
 
 private:
-	node * head;
+
 #define YARD_SIZE 52
-
-    yardsDLL(array<Bone, 52> bones);
-
     typedef std::array<Bone, YARD_SIZE> boneArray;
-
+	node * head;
     int boneCount;
-    void displayList();
-    void firstFill(DLL::node *&, DLL::node *, boneArray bArray, int &);
-    void drawFirstHand(playersDLL &, int &);
-    void drawBone(playersDLL &, DLL::node*&);
+
+    void drawFirstHand(DLL::node *&, playersDLL &, int &);
+    static void drawBone(playersDLL &, DLL::node*&);
 
 
 public:
     yardsDLL();
     yardsDLL(const yardsDLL &);
-    virtual ~yardsDLL()
-    {
-
-    }
+    yardsDLL& operator=(const yardsDLL &);
+    virtual ~yardsDLL();
+    virtual void destroy();
     void createYard(const Bone &);
     void drawHand(playersDLL &);
     bool draw(playersDLL &);
+    int& totalBones();
     virtual void display() {
-        DLL::displayList(getHead());
+        DLL::displayList(head);
     }
 
 
