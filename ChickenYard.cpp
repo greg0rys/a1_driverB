@@ -18,7 +18,7 @@ ChickenYard::ChickenYard()
     shuffled = !shuffled;
 
     generateYard();
-    boneYard->display();
+
 }
 
 /*
@@ -118,9 +118,9 @@ ChickenYard::~ChickenYard() {
 
 
 
-void ChickenYard::getHand(Player *& aPlayer)
+void ChickenYard::getHand(Player & aPlayer)
 {
-    boneYard->drawHand(aPlayer->getHand());
+    boneYard->drawHand(aPlayer.getHand());
 }
 
 

@@ -24,13 +24,6 @@ Bone &Bone::operator=(const Bone & aBone)
     return *this;
 }
 
-ostream& operator<<(ostream& out, Bone &aBone)
-{
-     aBone.printSides();
-     out << "\t ";
-
-     return out;
-}
 
 Bone::~Bone()
 {

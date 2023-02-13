@@ -39,6 +39,7 @@ Player& Player::operator=(const Player &aPlayer)
         points = aPlayer.points;
         handCount = aPlayer.handCount;
         firstHand = aPlayer.firstHand;
+        playerNo = aPlayer.playerNo;
         return *this;
     }
 
@@ -52,6 +53,7 @@ Player& Player::operator=(const Player &aPlayer)
     handCount = aPlayer.handCount;
     points = aPlayer.points;
     firstHand = aPlayer.firstHand;
+    playerNo = aPlayer.playerNo;
 
     return *this;
 }
@@ -98,6 +100,7 @@ void Player::addToHand(const Bone & aBone)
 {
    hand->addBone(aBone);
    handCount++;
+
 }
 
 
@@ -122,7 +125,8 @@ void Player::getPoints(int &score)
  */
 void Player::displayHand()
 {
-    hand->display(); // will need to setup this method in DLL
+    hand->display();
+    cout << endl << endl;
 }
 
 /*
@@ -133,7 +137,8 @@ void Player::displayHand()
 
 ostream &operator<<(ostream &out,  Player &aPlayer)
 {
-    out << aPlayer.getHand() << endl;
+    out << endl;
+    aPlayer.displayHand();
     return out;
 }
 

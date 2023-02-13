@@ -27,10 +27,8 @@ protected:
 
 
 
-        explicit node(const Bone &aBone)
+        node(const Bone &aBone)
         {
-            if (data)
-                delete data;
             data = new Bone(aBone);
             prev = next = nullptr;
         }
@@ -66,8 +64,6 @@ protected:
 
     void insert(DLL::node *&, const Bone &);
     static void remove(DLL::node *&);
-
-    virtual void displayList(node *);
 
     void destroyList(node *&);
 
@@ -110,6 +106,7 @@ private:
     void getPoints(DLL::node *, int &);
     node* getEndOfHand();
     node*& getStartofHand();
+    virtual void displayList(node *);
 
 
 public:
@@ -126,10 +123,12 @@ public:
 
     void getPoints(int &);
 
-    friend ostream& operator<<(ostream&, playersDLL &);
 
     void addBone(const Bone &);
     virtual void getCount(int &);
+    Bone& getRecentDraw(){
+        return *tail->data;
+    }
 
 
 };
@@ -145,7 +144,8 @@ private:
     int boneCount;
 
     void drawFirstHand(DLL::node *&, playersDLL &, int &);
-    static void drawBone(playersDLL &, DLL::node*&);
+    void drawBone(playersDLL &, DLL::node*&);
+    virtual void displayList(node *);
 
 
 public:
@@ -159,7 +159,7 @@ public:
     bool draw(playersDLL &);
     int& totalBones();
     virtual void display() {
-        DLL::displayList(head);
+       displayList(head);
     }
 
 

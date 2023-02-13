@@ -27,7 +27,6 @@ public:
         return sideA + sideB;
     }
 
-    friend ostream& operator<<(ostream &, Bone &);
     void printSides()
     {
 

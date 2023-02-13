@@ -1,12 +1,12 @@
 CC = g++
 CPPFLAGS = -g -Wall -std=c++17
-DEPS = main.h ChickenYard.h Player.h Bone.h DLL.h
+DEPS = main.h ChickenYard.h Player.h Bone.h DLL.h Game.h Field.h
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CPPFLAGS)
 
 app: main.o ChickenYard.o Player.o Bone.o Game.o Field.o DLL.o
-	$(CC) -o app Bone.o ChickenYard.o Player.o DLL.o main.o
+	$(CC) -o app Bone.o ChickenYard.o Player.o DLL.o Game.o Field.o main.o
 
 .PHONY: clean
 

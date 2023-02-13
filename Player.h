@@ -30,5 +30,13 @@ public:
     void getPlayerNo(int &) const;
     void setPlayerNo(const int);
     playersDLL& getHand();
+    Bone& getLastDraw()
+    {
+        return hand->getRecentDraw();
+    }
+    void setPoints(int &pts)
+    {
+        points = pts;
+    }
 
 };

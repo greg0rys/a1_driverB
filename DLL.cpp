@@ -69,22 +69,20 @@ void DLL::insert(DLL::node*& start, const Bone &bone)
 {
     if(!start)
     {
-        start = new node(bone);
-        start->next = nullptr;
+        start = new node();
+        start->data = new Bone(bone);
         start->prev = nullptr;
-
-    }
-
-    if(start->next)
-        insert(start->next, bone);
-
-    if(!start->next)
-    {
-        start->next = new node(bone);
-        start->next->prev = start;
-        start->next->next = nullptr;
+        start->next = nullptr;
         return;
     }
+
+    node * temp = new node();
+    temp->data = new Bone(bone);
+    temp->next = start;
+    start->prev = temp;
+    start = temp;
+
+
 
 }
 
@@ -97,24 +95,7 @@ void DLL::remove(DLL::node *&target)
 }
 
 
-void DLL::displayList(DLL::node * top)
-{
-    if(!top)
-        return;
 
-    static int formatter = 1;
-
-    cout << "[ " << top->data->getSideA()
-         << "|" << top->data->getSideB() << " ]";
-
-    // use a formatter counter to keep bones in rows of 5
-    if(formatter % 5 == 0)
-        cout << endl << endl;
-    formatter++;
-
-    displayList(top->next);
-
-}
 
 
 
@@ -183,14 +164,31 @@ void playersDLL::display()
     int points = 0;
     getPoints(points);
     /* have client program check for empty before calling this*/
-    DLL::displayList(head);
+    displayList(head);
 
     cout << "\n\t Most recent draw: ";  tail->data->printSides();
          cout << " Current Points: " << points
          <<" Total Bones: " << handCount << endl;
 }
 
+void playersDLL::displayList(DLL::node *start)
+{
+    static int format = 1;
+    if(!start)
+    {
+        format = 1;
+        return;
+    }
 
+
+    start->data->printSides();
+    cout << " ";
+
+    if(format % 4 == 0)
+        cout << endl;
+    format++;
+    displayList(start->next);
+}
 
 
 void playersDLL::getPoints(int &pointTotal)
@@ -240,14 +238,6 @@ void playersDLL::getCount(int &val)
 }
 
 
-
-ostream &operator<<(ostream &out, playersDLL &playersHand)
-{
-    playersHand.display();
-    out << "********** "  << "\t********** " << endl;
-    return out;
-
-}
 
 
 
@@ -332,6 +322,7 @@ void yardsDLL::drawFirstHand(DLL::node*& yard,playersDLL & aPlayer,
     aPlayer.addBone(*yard->data);
     drawFirstHand(yard->next, aPlayer, ++count);
     DLL::remove(yard);
+    boneCount--;
 
 }
 
@@ -351,6 +342,7 @@ void yardsDLL::drawBone(playersDLL& aPlayer, DLL::node *&boneYard)
 
     aPlayer.addBone(*boneYard->data);
     DLL::remove(boneYard);
+    boneCount--;
 
 }
 
@@ -358,6 +350,22 @@ void yardsDLL::drawBone(playersDLL& aPlayer, DLL::node *&boneYard)
 int& yardsDLL::totalBones()
 {
     return boneCount;
+}
+
+
+void yardsDLL::displayList(DLL::node * start)
+{
+    if(!start)
+        return;
+    static int format = 1;
+
+    start->data->printSides();
+    cout << " ";
+
+    if(format % 4 == 0)
+        cout << endl;
+    format++;
+    displayList(start->next);
 }
 
 

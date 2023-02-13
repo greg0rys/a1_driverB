@@ -38,6 +38,6 @@ public:
     void shuffleBones();
     int getCount();
     bool draw(Player *&);
-    void getHand(Player *&);
+    void getHand(Player &);
 
 };
