@@ -1,19 +1,20 @@
 #include "Game.h"
 
-Game::Game():boneYard(nullptr)
-            ,hasBones(false)
-            , isTied(false)
-            ,leadPlayer(0)
-            , leadPoints(0)
-            , numPlayers(0)
+Game::Game():
+            players(nullptr),
+            tPlayers(nullptr),
+            boneYard(nullptr),
+            hasBones(false),
+            isTied(false),
+            firstPlace(nullptr),
+            numPlayers(0)
 
 {}
 
 Game::Game(const Game &aGame):boneYard(nullptr),
                               hasBones(false),
                               isTied(false),
-                              leadPlayer(0),
-                              leadPoints(0),
+                              firstPlace(nullptr),
                               numPlayers(0)
 {
     *this = aGame;
@@ -30,7 +31,15 @@ Game& Game::operator=(const Game &aGame)
         boneYard = nullptr;
         players = aGame.players;
         hasBones = aGame.hasBones;
-        leadPlayer = aGame.leadPlayer;
+        if(!aGame.firstPlace)
+        {
+            firstPlace = nullptr;
+        }
+        else
+        {
+            firstPlace = new leadPlayer(aGame.firstPlace->playerNum,
+                                        aGame.firstPlace->score);
+        }
         isTied = aGame.isTied;
         numPlayers = aGame.numPlayers;
         leadPoints = aGame.leadPoints;
@@ -44,11 +53,19 @@ Game& Game::operator=(const Game &aGame)
     boneYard = new ChickenYard(*aGame.boneYard);
     players = aGame.players;
     hasBones = aGame.hasBones;
-    leadPlayer = aGame.leadPlayer;
+    if(!aGame.firstPlace)
+    {
+        firstPlace = nullptr;
+    }
+    else
+    {
+        firstPlace = new leadPlayer(aGame.firstPlace->playerNum,
+                                    aGame.firstPlace->score);
+    }
     isTied = aGame.isTied;
     numPlayers = aGame.numPlayers;
-    leadPoints = aGame.leadPoints;
 
+    
 
     return *this;
 }
@@ -104,7 +121,8 @@ void Game::createPlayersContainer(int &numPlayers)
         return;
     }
     Player newPlayer;
-    newPlayer.setPlayerNo(no++);
+    boneYard->getHand(newPlayer)
+    newPlayer.setPlayerNo(no);
     players.push_back(newPlayer);
     createPlayersContainer(--numPlayers);
 
@@ -137,7 +155,7 @@ void Game::updateScores()
         player.getPoints(pPoints);
         player.getPlayerNo(num);
 
-        if(leadPoints > pPoints)
+        if(leadPoints <= pPoints)
         {
             leadPoints = pPoints;
             leadPlayer = num;
@@ -168,18 +186,19 @@ void Game::getRoundResults()
     int playerNum, points = 0;
     Bone * recentBone = nullptr;
 
-    for(auto x = players.begin(); x != players.end(); x++)
+    for(auto & p : players)
     {
-        x->getPlayerNo(playerNum);
-        x->getPoints(points);
-        recentBone = &x->getLastDraw();
+        points = 0;
+        playerNum = 0;
+        p.getPlayerNo(playerNum);
+        p.getPoints(points);
+        recentBone = &p.getLastDraw();
 
         cout << "*** Player Num: " << playerNum << " *** \n\t";
         cout << "Currently has: " << points << " point(s) "
              << "Most recent bone draw: "; recentBone->printSides();
              cout << "*** End of Player: " << playerNum << " results  ***";
              cout << endl;
-             points = 0;
     }
 
     cout << endl << endl;

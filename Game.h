@@ -9,21 +9,43 @@
 
 using std::cout;
 using std::endl;
-typedef std::vector<Player> pVector;
-typedef std::vector<int>    scoreVector;
+typedef Player ** pVector;
+typedef Player ** tiedPlayers;
 
 class Game
 {
 private:
+    struct leadPlayer
+    {
+        int playerNum;
+        int score;
+
+        leadPlayer()
+        {
+            playerNum = 0;
+            score = 0;
+        }
+
+        leadPlayer(const int & pNum, const int & pscore)
+        {
+            playerNum = pNum;
+            score = pscore;
+        }
+
+        ~leadPlayer()
+        {
+            playerNum = score = 0;
+        }
+    };
     pVector players;
-    pVector tiedPlayers;
-    scoreVector playerScores;
+    tiedPlayers tPlayers;
     ChickenYard * boneYard;
     bool hasBones;
     bool isTied;
-    int  leadPlayer;
-    int leadPoints;
+    leadPlayer * firstPlace;
     int numPlayers;
+
+
     void createPlayersContainer(int &);
     void fillPlayersHands();
     int getInteger()
