@@ -1,10 +1,11 @@
 #include "Player.h"
+
 #include <iostream>
 #include <valarray>
 
 using namespace std;
 
-class playerList
+class playerQueue
 {
 	private:
 		struct node
@@ -38,24 +39,29 @@ class playerList
 		node * back;
 		int	   numPlayers;
 		void displayQueue(node *);
-		void Dequeue(Player &);
+		void remove(Player &);
 		void EnQueue(const Player &, node *&);
 		Player * findLead(node *);
 		void emptyQueue(node *&);
 		void copyChain(node *&, node *);
-		Player * search(node *, int &);
+		Player * search(node *, int &, int &);
 
 	public:
-		playerList();
-		playerList(const playerList &);
-		playerList& operator=(const playerList &);
-		~playerList();
+		playerQueue();
+		playerQueue(const playerQueue &);
+		playerQueue& operator=(const playerQueue &);
+		~playerQueue();
 		void destroy(){emptyQueue(front);}
-		void peekFront(Player &);
-		void pop(Player &);
-		void push(const Player &);
+		bool peekFront(Player &);
+		bool pop(Player &);
+		bool push(const Player &);
 		int& getNumPlayers(){return numPlayers;}
 		bool getLeadPlayer(Player &);
 		bool isEmpty();
+        Player* getPlayer(int );
+        void display()
+        {
+            displayQueue(front);
+        }
 
 };

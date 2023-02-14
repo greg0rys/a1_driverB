@@ -159,3 +159,10 @@ playersDLL& Player::getHand()
 }
 
 
+
+bool operator==(const Player &p1, const Player &p2)
+{
+    return p1.points == p2.points;
+}
+
+

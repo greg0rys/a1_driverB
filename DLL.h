@@ -71,7 +71,7 @@ protected:
 
     void countChain(node *, int &);
 
-    static bool isEmpty(node *);
+     bool isEmpty(node *);
 
     node*& getList();
 
@@ -115,6 +115,15 @@ public:
     playersDLL(const playersDLL &);
 
     playersDLL & operator=(const playersDLL &);
+    friend ostream& operator<<(ostream &out, playersDLL &aPlayer)
+    {
+        if(!aPlayer.getHead()) return out;
+
+        aPlayer.displayList(aPlayer.getHead());
+        out << endl;
+
+        return out;
+    }
 
     virtual ~playersDLL();
     virtual void destroy();

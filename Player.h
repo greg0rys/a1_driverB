@@ -21,6 +21,7 @@ public:
     Player();
     Player(const Player &);
     Player& operator=(const Player &);
+    friend bool operator==(const Player &, const Player &);
     friend ostream& operator<<(ostream &out,  Player &);
     ~Player();
     void getPoints(int &);

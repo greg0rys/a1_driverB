@@ -2,7 +2,7 @@
 
 Game::Game():
             players(nullptr),
-            tPlayers(nullptr),
+            tiedPlayers(nullptr),
             boneYard(nullptr),
             hasBones(false),
             isTied(false),
@@ -42,8 +42,6 @@ Game& Game::operator=(const Game &aGame)
         }
         isTied = aGame.isTied;
         numPlayers = aGame.numPlayers;
-        leadPoints = aGame.leadPoints;
-
         return *this;
     }
 
@@ -82,6 +80,7 @@ void Game::gameStart()
 {
     cout << "How many players will be playing today? ";
     int totalPlayers = getInteger();
+    int playerNums = 1;
     numPlayers = totalPlayers;
 
     cout << endl << "Generating Bone Yard " << endl;
@@ -89,7 +88,7 @@ void Game::gameStart()
 
     cout << "\n\n* Adding " << totalPlayers << " players to the game.\n "
     << endl;
-    createPlayersContainer(totalPlayers);
+    createPlayersContainer(totalPlayers, playerNums);
 
     int before = boneYard->getCount();
     int after = 0;
@@ -99,13 +98,12 @@ void Game::gameStart()
     after = boneYard->getCount();
     cout << " ** Success! Here's the hands **" << endl << endl;
     cout << "* Updating Scores " << endl << endl;
-    updateScores();
-    displayPlayersHands();
 
     cout << "Total bones before fill: " << before << "\tafter: " << after;
     cout << endl;
+    cout << "Total players: " << players->getNumPlayers() << endl;
 
-    getRoundResults();
+
 
 
 
@@ -113,18 +111,27 @@ void Game::gameStart()
 }
 
 
-void Game::createPlayersContainer(int &numPlayers)
+void Game::createPlayersContainer(int &playerCount,
+                                  int &pNum)
 {
-    int no = 1;
-    if(numPlayers == 0)
+    if(!players)
+        players = new playerQueue();
+    players->getNumPlayers();
+
+    if(pNum <= numPlayers)
+    {
+        Player newPlayer;
+        newPlayer.setPlayerNo(pNum);
+        players->push(newPlayer);
+        createPlayersContainer(--playerCount, ++pNum);
+
+    }
+    else
     {
         return;
     }
-    Player newPlayer;
-    boneYard->getHand(newPlayer)
-    newPlayer.setPlayerNo(no);
-    players.push_back(newPlayer);
-    createPlayersContainer(--numPlayers);
+
+
 
 }
 
@@ -132,40 +139,17 @@ void Game::createPlayersContainer(int &numPlayers)
 
 void Game::fillPlayersHands()
 {
-    for(Player & p: players)
+    for(auto x = 1; x <= numPlayers; x++)
     {
-        boneYard->getHand(p);
+        Player * temp = players->getPlayer(x);
+        boneYard->getHand(*temp);
+
     }
 
 }
 
 
-void Game::updateScores()
-{
 
-    int pPoints = 0;
-    int num = 0;
-    players[0].getPoints(leadPoints);
-    cout << "current lead " << leadPoints << endl;
-
-
-    for(auto & player : players)
-    {
-        pPoints = 0;
-        player.getPoints(pPoints);
-        player.getPlayerNo(num);
-
-        if(leadPoints <= pPoints)
-        {
-            leadPoints = pPoints;
-            leadPlayer = num;
-
-        }
-
-    }
-
-
-}
 
 
 
@@ -173,39 +157,7 @@ void Game::updateScores()
 
 void Game::displayPlayersHands()
 {
-    for(Player & p: players)
-    {
-        p.displayHand();
-    }
-
-}
-
-
-void Game::getRoundResults()
-{
-    int playerNum, points = 0;
-    Bone * recentBone = nullptr;
-
-    for(auto & p : players)
-    {
-        points = 0;
-        playerNum = 0;
-        p.getPlayerNo(playerNum);
-        p.getPoints(points);
-        recentBone = &p.getLastDraw();
-
-        cout << "*** Player Num: " << playerNum << " *** \n\t";
-        cout << "Currently has: " << points << " point(s) "
-             << "Most recent bone draw: "; recentBone->printSides();
-             cout << "*** End of Player: " << playerNum << " results  ***";
-             cout << endl;
-    }
-
-    cout << endl << endl;
-    cout << "****** CURRENT WINNER ******\n";
-    cout << "Player " << leadPlayer << " has the winning score of: "
-         << leadPoints << endl;
-    cout << "****** END OF GAME STATS ******\n\n";
+    players->display();
 
 }
 
@@ -214,34 +166,35 @@ void Game::getRoundResults()
 
 
 
-void Game::handleTie(int &targetVal)
-{
-    int pNum, pPoints = 0;
 
-    if(isTied)
-    {
-        clearTie();
-    }
-
-    for(auto temp : players)
-    {
-        temp.getPlayerNo(pNum);
-        temp.getPoints(pPoints);
-        if(pPoints == targetVal)
-            tiedPlayers.push_back(temp);
-    }
-}
-
-
-void Game::clearTie()
-{
-    if(!isTied)
-        return;
-    // delete the vector of tied players each time so its accurate
-    for(auto start = tiedPlayers.begin(); start != tiedPlayers.end();)
-    {
-        start  = tiedPlayers.erase(start);
-        start++;
-    }
-}
+//void Game::handleTie(int &targetVal)
+//{
+//    int pNum, pPoints = 0;
+//
+//    if(isTied)
+//    {
+//        clearTie();
+//    }
+//
+//    for(auto temp : players)
+//    {
+//        temp.getPlayerNo(pNum);
+//        temp.getPoints(pPoints);
+//        if(pPoints == targetVal)
+//            tiedPlayers.push_back(temp);
+//    }
+//}
+//
+//
+//void Game::clearTie()
+//{
+//    if(!isTied)
+//        return;
+//    // delete the vector of tied players each time so its accurate
+//    for(auto start = tiedPlayers.begin(); start != tiedPlayers.end();)
+//    {
+//        start  = tiedPlayers.erase(start);
+//        start++;
+//    }
+//}
 

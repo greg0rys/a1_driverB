@@ -100,7 +100,7 @@ void DLL::remove(DLL::node *&target)
 
 
 /**
- * playerList implements
+ * playerQueue implements
  */
 
 playersDLL::playersDLL(): DLL(),head(nullptr),tail(nullptr),handCount(0)

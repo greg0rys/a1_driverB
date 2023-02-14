@@ -2,15 +2,16 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include "playerQueue.h"
 #include <valarray>
-#include "Player.h"
 #include "ChickenYard.h"
 
 
-using std::cout;
-using std::endl;
-typedef Player ** pVector;
-typedef Player ** tiedPlayers;
+
+using namespace std;
+
+
+
 
 class Game
 {
@@ -37,8 +38,8 @@ private:
             playerNum = score = 0;
         }
     };
-    pVector players;
-    tiedPlayers tPlayers;
+    playerQueue * players;
+    playerQueue * tiedPlayers;
     ChickenYard * boneYard;
     bool hasBones;
     bool isTied;
@@ -46,9 +47,9 @@ private:
     int numPlayers;
 
 
-    void createPlayersContainer(int &);
+    void createPlayersContainer(int &, int &);
     void fillPlayersHands();
-    int getInteger()
+    static int getInteger()
     {
         int numberIn;
         cin >> numberIn;
